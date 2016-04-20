@@ -1,0 +1,96 @@
+<html>
+<head>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<!-- Load the d3 library. -->
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<style>
+/* put a border around the svg element so we can see the coordinate system better. */
+body { 
+  font-family: "Open Sans"; 
+  } 
+div { 
+  margin: 30px; 
+}
+svg { 
+  background-color: white; 
+}
+h1 {
+  font-weight: bolder;
+}
+</style>
+</head>
+<body>
+
+<h1>EDUCATION AND STUFF</h1>
+
+
+<!-- The SVG element will go in here -->
+<div id="buttons">
+  <button id="change1">Let's go!</button>
+</div>
+<div id="map"></div>
+
+<script>
+// svg parameters
+var width = 960,
+    height = 500;
+
+// set up world map
+var projection = d3.geo.mercator();
+var path = d3.geo.path().projection(projection);
+
+// An ordinal scale with 10 default colors. See https://github.com/mbostock/d3/wiki/Ordinal-Scales.
+var digitScale = d3.scale.category20c()
+
+// A diverging three-value scale from http://colorbrewer2.org/
+// Note that (1) this is a *linear* scale, but its output is a color code
+// and (2) this is *piecewise* linear, essentially combining two linear scales
+// that diverge at 0.
+var populationScale = d3.scale.linear().domain([-5, 0, 5]).range(["#d8b365", "#f5f5f5", "#5ab4ac"]);
+
+var svg = d3.select("#map").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+var g = svg.append("g");
+var worldObjects;
+
+
+d3.json("world-50m.json", function(error, world) {
+  //worldObjects = world;
+  worldObjects = topojson.feature(world, world.objects.countries).features
+
+  countryPaths = g.selectAll("path")
+  .data(worldObjects).enter()
+  .append("path")
+  .attr("class", "county")
+  .attr("d", path)
+  .style("fill", function (country) {
+    // Grab the first digit of the FIPS code, and convert it
+    //  to a color.
+    return digitScale(Math.floor(country.id / 100));
+  })
+  .style("stroke", "none");
+
+
+  // svg.selectAll(".country")
+  //     .data(worldObjects).enter()
+  //     .insert("path", ".graticule")
+  //     .attr("class", function(d) { return "country " + "code" + d.id; })
+  //     .attr("d", path);
+
+  // countyPaths.style("fill", function (county) {
+  //       var countyData = usdaAtlas.get(county.id);
+  //       if (! countyData) { return "#000";}
+  //       return populationScale( 0.4 * countyData.PopChangeRate0010 );
+  //       // set fill based on county attributes
+  //     });
+  
+});
+
+
+
+</script>
+
+</body>
+</html>
