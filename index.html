@@ -4,6 +4,7 @@
 <!-- Load the d3 library. -->
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="data.js"></script>
 <style>
 /* put a border around the svg element so we can see the coordinate system better. */
 body { 
@@ -63,146 +64,8 @@ var svg = d3.select("#map").append("svg")
 var g = svg.append("g");
 var worldObjects;
 
-// Initializations for access outside csv functions. 
-// Data and averages over the represented years.
-// each set of averages has key 'world': <world average> which represents
-//   the average of all averages
-var edRanks;
-var edRanksAvgs;
-var GDPGrowth;
-var GDPGrowthAvgs;
-var povertyGap5;
-var povertyGap5Avgs;
-var povertyGap125;
-var povertyGap125Avgs;
-var undernourishment;
-var undernourishmentAvgs;
-var genderGap;
-var genderGapAvgs;
-var childMort;
-var childMortAvgs;
-var isoCodes;
 
-// get average ranks of the country object across the years represented
-function getAvg(obj){ 
-  var avg = 0;
-  var count = 0;
-  for (var key in obj) {
-    if (!obj.hasOwnProperty(key) || key == "Country" || isNaN(obj[key])) {
-        //The current property is not a direct property of p, or is not a number
-        continue;
-    }
-    //Do your logic with the property here
-    avg += Number(obj[key]);
-    count += 1;
-  }
-  avg /= count;
-  return avg;
-}
-
-d3.csv("EducationIndexRanks.csv", function (error, data) {
-  edRanks = data;
-  
-  //extract averages
-  edRanksAvgs = {'world': 0};
-  edRanks.forEach(function (obj){
-    var avg = getAvg(obj);
-    edRanksAvgs[obj['Country']] = avg;
-    edRanksAvgs['world'] += avg;
-  })
-  edRanksAvgs['world'] /= (Object.keys(edRanksAvgs).length - 1) ;
-  
-
-});
-
-d3.csv("isoCodes.csv", function (error, data) {
-  isoCodes = data;
-});
-
-d3.csv("AnnualGDPGrowthRanks.csv", function (error, data) {
-  GDPGrowth = data;
-
-  //extract averages
-  GDPGrowthAvgs = {'world': 0};
-  GDPGrowth.forEach(function (obj){
-    var avg = getAvg(obj);
-    GDPGrowthAvgs[obj['Country']] = avg;
-    GDPGrowthAvgs['world'] += avg;
-  })
-  GDPGrowthAvgs['world'] /= (Object.keys(GDPGrowthAvgs).length - 1) ;
-
-});
-
-d3.csv("ChildUnder5MortPer1000Prob.csv", function (error, data) {
-  childMort = data;
-
-  //extract averages
-  childMortAvgs = {'world': 0};
-  childMort.forEach(function (obj){
-    var avg = getAvg(obj);
-    childMortAvgs[obj['Country']] = avg;
-    childMortAvgs['world'] += avg;
-  })
-  childMortAvgs['world'] /= (Object.keys(childMortAvgs).length - 1) ;
-
-});
-
-d3.csv("GenderGap.csv", function (error, data) {
-  genderGap = data;
-
-  //extract averages
-  genderGapAvgs = {'world': 0};
-  genderGap.forEach(function (obj){
-    var avg = getAvg(obj);
-    genderGapAvgs[obj['Country']] = avg;
-    genderGapAvgs['world'] += avg;
-  })
-  genderGapAvgs['world'] /= (Object.keys(genderGapAvgs).length - 1) ;
-
-});
-
-d3.csv("PovertyGap5DollarsADayRanks.csv", function (error, data) {
-  povertyGap5 = data;
-
-  //extract averages
-  povertyGap5Avgs = {'world': 0};
-  povertyGap5.forEach(function (obj){
-    var avg = getAvg(obj);
-    povertyGap5Avgs[obj['Country']] = avg;
-    povertyGap5Avgs['world'] += avg;
-  })
-  povertyGap5Avgs['world'] /= (Object.keys(povertyGap5Avgs).length - 1) ;
-
-});
-
-d3.csv("PovertyGapDollar25Ranks.csv", function (error, data) {
-  povertyGap125 = data;
-
-  //extract averages
-  povertyGap125Avgs = {'world': 0};
-  povertyGap125.forEach(function (obj){
-    var avg = getAvg(obj);
-    povertyGap125Avgs[obj['Country']] = avg;
-    povertyGap125Avgs['world'] += avg;
-  })
-  povertyGap125Avgs['world'] /= (Object.keys(povertyGap125Avgs).length - 1) ;
-
-});
-
-d3.csv("UndernourishmentPrevalenceRanks.csv", function (error, data) {
-  undernourishment = data;
-
-  //extract averages
-  undernourishmentAvgs = {'world': 0};
-  undernourishment.forEach(function (obj){
-    var avg = getAvg(obj);
-    undernourishmentAvgs[obj['Country']] = avg;
-    undernourishmentAvgs['world'] += avg;
-  })
-  undernourishmentAvgs['world'] /= (Object.keys(undernourishmentAvgs).length - 1) ;
-
-});
-
+// Build map, add hover/click effects
 d3.json("world-50m.json", function(error, world) {
   //worldObjects = world;
   worldObjects = topojson.feature(world, world.objects.countries).features
@@ -219,6 +82,8 @@ d3.json("world-50m.json", function(error, world) {
   })
   .style("stroke", "white")
   .style("stroke-width", 1)
+  // highlight country in black on hover
+  // TODO: Prettify the detail spreadsheet that comes with the hover effect
   .on("mouseover", function (d) {
     d3.select("h2").text(isoCodes[0][d.id] + "\nDetails will go here?");
     d3.select(this)
@@ -228,20 +93,6 @@ d3.json("world-50m.json", function(error, world) {
       d3.select(this)
       .style("fill", digitScale(Math.floor(d.id / 100)));
     });
-
-
-  // svg.selectAll(".country")
-  //     .data(worldObjects).enter()
-  //     .insert("path", ".graticule")
-  //     .attr("class", function(d) { return "country " + "code" + d.id; })
-  //     .attr("d", path);
-
-  // countyPaths.style("fill", function (county) {
-  //       var countyData = usdaAtlas.get(county.id);
-  //       if (! countyData) { return "#000";}
-  //       return populationScale( 0.4 * countyData.PopChangeRate0010 );
-  //       // set fill based on county attributes
-  //     });
   
 
 });
