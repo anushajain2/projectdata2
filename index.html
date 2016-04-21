@@ -12,11 +12,18 @@ body {
 div { 
   margin: 30px; 
 }
+div#map{
+  float: left;
+}
 svg { 
   background-color: white; 
 }
 h1 {
   font-weight: bolder;
+}
+h2 {
+  font-weight: bold;
+  float: left;
 }
 </style>
 </head>
@@ -30,6 +37,7 @@ h1 {
   <button id="change1">Let's go!</button>
 </div>
 <div id="map"></div>
+<h2></h2>
 
 <script>
 // svg parameters
@@ -55,6 +63,60 @@ var svg = d3.select("#map").append("svg")
 var g = svg.append("g");
 var worldObjects;
 
+var edRanks;
+var GDPGrowth;
+var povertyGap5;
+var povertyGap125;
+var undernourishment;
+var genderGap;
+var childMort;
+var isoCodes;
+
+d3.csv("EducationIndexRanks.csv", function (error, data) {
+  edRanks = data;
+
+  // points = countries.map(function (country) {
+  //   // Create shorter variable names
+  //   return {
+  //     x: Math.log(Number(country["Doctors, per 10,000 population"])),
+  //     y: Number(country["Health spending, % of GDP"]),
+  //     label: country["Location"]
+  //   };
+  // })
+  // .filter(function (point) {
+  //   // Some countries are missing one or more data fields,
+  //   //  so silently drop them. Sorry Belgium!
+  //   return ! isNaN(point.x) && ! isNaN(point.y);
+  // });
+});
+
+d3.csv("isoCodes.csv", function (error, data) {
+  isoCodes = data;
+});
+
+d3.csv("AnnualGDPGrowthRanks.csv", function (error, data) {
+  GDPGrowth = data;
+});
+
+d3.csv("ChildUnder5MortPer1000Prob.csv", function (error, data) {
+  childMort = data;
+});
+
+d3.csv("GenderGap.csv", function (error, data) {
+  genderGap = data;
+});
+
+d3.csv("PovertyGap5DollarsADayRanks.csv", function (error, data) {
+  povertyGap5 = data;
+});
+
+d3.csv("PovertyGapDollar25Ranks.csv", function (error, data) {
+  povertyGap125 = data;
+});
+
+d3.csv("UndernourishmentPrevalenceRanks.csv", function (error, data) {
+  undernourishment = data;
+});
 
 d3.json("world-50m.json", function(error, world) {
   //worldObjects = world;
@@ -63,14 +125,24 @@ d3.json("world-50m.json", function(error, world) {
   countryPaths = g.selectAll("path")
   .data(worldObjects).enter()
   .append("path")
-  .attr("class", "county")
+  .attr("class", "country")
   .attr("d", path)
   .style("fill", function (country) {
     // Grab the first digit of the FIPS code, and convert it
     //  to a color.
     return digitScale(Math.floor(country.id / 100));
   })
-  .style("stroke", "none");
+  .style("stroke", "white")
+  .style("stroke-width", 1)
+  .on("mouseover", function (d) {
+    d3.select("h2").text(isoCodes[0][d.id] + "\nDetails will go here?");
+    d3.select(this)
+      .style("fill","black");
+    })
+  .on("mouseout", function(d) {
+      d3.select(this)
+      .style("fill", digitScale(Math.floor(d.id / 100)));
+    });
 
 
   // svg.selectAll(".country")
@@ -86,6 +158,7 @@ d3.json("world-50m.json", function(error, world) {
   //       // set fill based on county attributes
   //     });
   
+
 });
 
 
