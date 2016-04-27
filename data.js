@@ -39,6 +39,7 @@ function getAvg(obj){
   return avg;
 }
 
+
 d3.csv("EducationIndexRanks.csv", function (error, data) {
   edRanks = data;
   

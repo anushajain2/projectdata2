@@ -1,17 +1,18 @@
+<!-- 
+  By Jay Castro
+  map zoom sbasics ourced from: http://bl.ocks.org/mbostock/4699541 
+-->
 <html>
 <head>
   <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
 <!-- Load the d3 library. -->
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script src="http://d3js.org/topojson.v1.min.js"></script>
-
-<!-- include any scripts you write here! -->
 <script src="data.js"></script>
-
 <style>
-/* put a border around the svg element so we can see the coordinate system better. */
 body { 
   font-family: "Open Sans"; 
+  background-color: black;
   } 
 div { 
   margin: 30px; 
@@ -20,7 +21,7 @@ div#map{
   float: left;
 }
 svg { 
-  background-color: white; 
+  background-color: black; 
 }
 h1 {
   font-weight: bolder;
@@ -28,6 +29,25 @@ h1 {
 h2 {
   font-weight: bold;
   float: left;
+}
+.country {
+  cursor: pointer;
+}
+
+.feature.active {
+  fill: orange;
+}
+
+.mesh {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+text {
+  text-anchor: start;
+  alignment-baseline: hanging;
+  fill: orange;
 }
 </style>
 </head>
@@ -46,7 +66,7 @@ h2 {
 <script>
 // svg parameters
 var width = 960,
-    height = 500;
+    height = 600;
 
 // set up world map
 var projection = d3.geo.mercator();
@@ -59,48 +79,127 @@ var digitScale = d3.scale.category20c()
 // Note that (1) this is a *linear* scale, but its output is a color code
 // and (2) this is *piecewise* linear, essentially combining two linear scales
 // that diverge at 0.
-var populationScale = d3.scale.linear().domain([-5, 0, 5]).range(["#d8b365", "#f5f5f5", "#5ab4ac"]);
+var populationScale = d3.scale.linear().domain([0, 10]).range(["red", "green"]);
 
 var svg = d3.select("#map").append("svg")
     .attr("width", width)
     .attr("height", height);
+var active = d3.select(null);
 var g = svg.append("g");
 var worldObjects;
-
+var temp;
 
 // Build map, add hover/click effects
-d3.json("world-50m.json", function(error, world) {
-  //worldObjects = world;
-  worldObjects = topojson.feature(world, world.objects.countries).features
+function draw() {
+  d3.json("world-50m.json", function(error, world) {
+    //worldObjects = world;
+    worldObjects = topojson.feature(world, world.objects.countries).features
 
-  countryPaths = g.selectAll("path")
-  .data(worldObjects).enter()
-  .append("path")
-  .attr("class", "country")
-  .attr("d", path)
-  .style("fill", function (country) {
-    // Grab the first digit of the FIPS code, and convert it
-    //  to a color.
-    return digitScale(Math.floor(country.id / 100));
-  })
-  .style("stroke", "white")
-  .style("stroke-width", 1)
-  // highlight country in black on hover
-  // TODO: Prettify the detail spreadsheet that comes with the hover effect
-  .on("mouseover", function (d) {
-    d3.select("h2").text(isoCodes[0][d.id] + "\nDetails will go here?");
-    d3.select(this)
-      .style("fill","black");
+    countryPaths = g.selectAll("path")
+    .data(worldObjects).enter()
+    .append("path")
+    .attr("class", "country")
+    .attr("d", path)
+    .style("fill", function (country) {
+      // Grab the first digit of the FIPS code, and convert it
+      //  to a color.
+      return populationScale(edRanksAvgs[isoCodes[0][country.id]]);
     })
-  .on("mouseout", function(d) {
-      d3.select(this)
-      .style("fill", digitScale(Math.floor(d.id / 100)));
-    });
-  
+    .style("stroke", "white")
+    // .style("stroke-width", 1)
+    // highlight country in black on hover
+    // TODO: Prettify the detail spreadsheet that comes with the hover effect
+    // .on("mouseover", function (d) {
+    //   d3.select("h2").text(isoCodes[0][d.id] + "\nDetails will go here?");
+    //   d3.select(this)
+    //     .style("fill","black");
+    //   })
+    // .on("mouseout", function(d) {
+    //     d3.select(this)
+    //     .style("fill", digitScale(Math.floor(d.id / 100)));
+    //   })
+    .on("click", clicked);
+    
+    g.append("path")
+          .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
+          .attr("class", "mesh")
+          .attr("d", path);
 
-});
+  });
+}
+
+function clicked(d) {
+  if (active.node() === this) return reset();
+  svg.selectAll('text').remove();
+  active.classed("active", false);
+  active = d3.select(this).classed("active", true);
+
+  var self = this;
+  var inactive = d3.selectAll('path');
+  // All other elements resize randomly.
+  temp = inactive.filter(function (x) { return self != this; });
+  temp.style("display", 'none');
+
+  var bounds = path.bounds(d),
+      dx = bounds[1][0] - bounds[0][0], 
+      dy = bounds[1][1] - bounds[0][1],
+      x = (bounds[0][0] + bounds[1][0]) / 2,
+      y = (bounds[0][1] + bounds[1][1]) / 2,
+      scale = .4 / Math.max(dx / width, dy / height),
+      //translate = [(width / 2 - scale * x) - 200, height / 2 - scale * y];
+      translate = [-1 * bounds[0][0] * scale, (-1 * bounds[0][1] * scale) + 100]
+
+  g.transition()
+      .duration(1000)
+      .style("stroke-width", 1.5 / scale + "px")
+      .attr("transform", "translate(" + translate + ")scale(" + scale + ")")
 
 
+  svg.selectAll('text')
+    .data(active)
+    .enter()
+    .append('text')
+    .text(isoCodes[0][d.id])
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('font-size', '40px')
+
+  g.append('text')
+    .attr('class', 'rank')
+    .text("Average Education Index: " + edRanksAvgs[isoCodes[0][d.id]])
+    .attr('x', bounds[0][0])
+    .attr('y', bounds[1][1]+80/scale)
+    .attr("font-size", 30 / scale + 'px')
+
+  // g.append('text')
+  //   .attr('class', 'details')
+  //   .text
+
+  drawData();
+}
+
+
+function reset() {
+  active.classed("active", false);
+  active = d3.select(null);
+
+  g.transition()
+      .duration(750)
+      .style("stroke-width", "1.5px")
+      .attr("transform", "");
+
+  svg.selectAll('text').remove();
+
+  temp.transition().delay(750).style('display', 'inline');
+
+}
+
+
+function drawData(){
+
+}
+
+draw();
 
 </script>
 
