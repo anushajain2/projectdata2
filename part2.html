@@ -27,13 +27,15 @@ text:hover { fill: blue; opacity: 1.0; font-weight: bold; font-size: xx-large; }
 <button onclick="mr()">Mortality Rate</button>
 <button onclick="gdp()">GDP Growth</button>
 <button onclick="mal()">Malnutrition</button>
-<div>
-	 <span id="location"></span>
-</div>
+
 <div id="plot">
   <div id="plot1"></div>
   <div id="plot2"></div>
+    
+  	<span id="location"></span>
+	<span id="Value"></span>
 
+  
 </div>
 <script>
 // svg parameters
@@ -45,9 +47,11 @@ var MalID;
 
 var circles;
 var circles1;
+var circles3;
 var circles21;
 var circles22;
 var circles4;
+var circles5;
 var lines2;
 var lines21;
 var lines22;
@@ -55,8 +59,8 @@ var lines23;
 
 var edRanksM;
 var childMort1;
-var povertyGap51;
-var povertyGap251;
+var povertyGap5N;
+var povertyGap25N;
 var undernourishment1;
 
 var svg = d3.select("#plot").append("svg")
@@ -69,12 +73,12 @@ var colorScale = d3.scale.linear().domain([0, 50, 100]).range(["#d8b365", "#f5f5
 
 var colorScale1 = d3.scale.linear().domain([47, 68, 89]).range(["#d8b365", "#f5f5f5", "#5ab4ac"]);
 
- d3.csv("PovertyGapDollar25RanksNew.csv", function (error, data) {
-     povertyGap251 = data;
+ d3.csv("PovertyGapDollar25.csv", function (error, data) {
+     povertyGap25N = data;
    });
 
-d3.csv("PovertyGap5DollarsADayRanksNew.csv", function (error, data) {
-     povertyGap51 = data;
+d3.csv("PovertyGap5Dollars.csv", function (error, data) {
+     povertyGap5N = data;
 });
 
 d3.csv("PovertyGap5DollarsADayRanksNew.csv", function (error, data) {
@@ -101,21 +105,6 @@ function isIncluded(country) {
    	  return count >=1;
 }
 
-function MalIDforCircle(country){
-   	  edRanks.forEach(function(d) {
-         undernourishment1.forEach(function(p) {
-            if(d["Country"]==p["Country"] && d["Country"]==country) {
-            	MalID = p["ID"];
-            	
-            }
-            else {
-            	MalID = 0;
-            }
-         });
-   	  });
-   	  return MalID;
-}
-
 function isIncludedMal(country) {
 	  var count=0;
    	  edRanks.forEach(function(d) {
@@ -136,12 +125,15 @@ d3.csv("GenderGap1.csv", function (error, data) {
   
 });
 
+
 function gg() {
  xScale = d3.scale.linear()
 	.domain([0, 10]).range([padding, width - padding]);
 	
  yScale = d3.scale.linear()
 	.domain([0, 10]).range([height - padding, padding]);
+ 
+
 
  //Represent countries using Education Index
  // Will add transitions to this, and use in every visualization.
@@ -152,14 +144,15 @@ function gg() {
 	.attr("cy", "100px")
 	.attr("r", 10)
 	.attr("country", function(d) { return d["Country"] })
-	.attr("MalID", function(d){ 
-			return MalIDforCircle(d["Country"]);
-	})
+	.attr("value", function(d) { return d[2012]; })
+	.attr("MID", function(d){ return d["MID"]; })
 	.style("fill", function(d) { return colorScale((d[2012] / 10) * 100); })
 	.style("opacity", 1)
 	.on("mouseover", function (d) {
+		
 		d3.select("#location").text(d["Country"]);
- });
+		d3.select("#Value").text(d[2012]);
+    });
 
  genderGap1.forEach(function(t){
     edRanks.forEach(function(d){
@@ -189,7 +182,11 @@ function pg() {
    var size2 = 0;
    var size3 = 0;
 
-   circles1.remove();
+  
+
+   var rScalePG = d3.scale.linear().domain([0, 100]).range([5, 20]);
+   var colorScalePG = d3.scale.linear().domain([1, 12]).range(["#1e7b7b", "#c1f0f0"]);
+ 
    circles.each(function (d, i) {
             if (isIncluded(d3.select(this).attr("country"))) {
               size = size + 200;
@@ -197,52 +194,74 @@ function pg() {
                   d3.select(this).transition().duration(1000)
                   .attr("cx", size + "px")  
                   .attr("cy", "100px")
-                  .attr("r", 20);
+                  .attr("r", function(d) { 
+                  	return rScalePG(
+                  		Math.abs((
+                  			(d3.select(this).attr("value") - 
+                  				edRanksAvgs["world"])/edRanksAvgs["world"]) * 100));
+                  })
+                  .style("fill", function(d){
+                  	 return colorScalePG(size/200);
+                  });
+
               }
               else if(size < 1800){
               	  size2 = size2 + 200;
                   d3.select(this).transition().duration(1000)
                   .attr("cx", size2 + "px")  
-                  .attr("cy", "200px")
-                  .attr("r", 20);
-
+                  .attr("cy", "300px")
+                  .attr("r", function(d) { 
+                  	return rScalePG(Math.abs((
+                  			(d3.select(this).attr("value") - 
+                  				edRanksAvgs["world"])/edRanksAvgs["world"]) * 100));
+                  })
+                  .style("fill", function(d){
+                  	 return colorScalePG(size/200);
+                  });
               }
               else {
               	  size3 = size3 + 200;
                   d3.select(this).transition().duration(1000)
                   .attr("cx", size3 + "px")  
-                  .attr("cy", "300px")
-                  .attr("r", 20); 
+                  .attr("cy", "500px")
+                  .attr("r", function(d) { 
+                  	return rScalePG(Math.abs((
+                  			(d3.select(this).attr("value") - 
+                  				edRanksAvgs["world"])/edRanksAvgs["world"]) * 100));
+                  })
+                  .style("fill", function(d){
+                  	 return colorScalePG(size/200);
+                  });
+               
               }
-
             }
             
             else { 
               d3.select(this).transition().duration(1000)
               .attr("cx", "0px");  
 
-            }
+            } 
             
     });
 
-    var rScaleP2 = d3.scale.linear().domain([0, 5]).range([5, 20]);
+    var rScaleP = d3.scale.linear().domain([0, 100]).range([5, 20]);
     var rScaleP5 = d3.scale.linear().domain([0, 40]).range([5, 20]);
 
-    circles3 = svg.selectAll(".plot3").data(povertyGap251);
+    circles3 = svg.selectAll(".plot3").data(povertyGap25N);
     circles3.enter().append("circle")
 	.attr("class", "plot")
 	.attr("cx", function(d) {
 	    if(d["ID"] == 1 || d["ID"] == 5 || d["ID"] == 9) {
-	    	return "300px";
+	    	return "250px";
 	    } 
 	    else if(d["ID"] == 2 || d["ID"] == 6 || d["ID"] == 10) {
-            return "500px";
+            return "450px";
 	    }
 	    else if(d["ID"] == 3 || d["ID"] == 7 || d["ID"] == 11) {
-	    	return "700px";
+	    	return "650px";
 	    }
 	    else if(d["ID"] == 4 || d["ID"] == 8 || d["ID"] == 12) {
-	    	return "900px";
+	    	return "850px";
 	    }	
 
 	})
@@ -251,34 +270,37 @@ function pg() {
 	    	return "80px";
 	    } 
 	    else if(d["ID"] < 9) {
-            return "180px";
+            return "280px";
 	    }
 	    else {
-	    	return "280px";
+	    	return "480px";
 	    }	
 	})
-	.attr("r", function(d){ return rScaleP2(d[2012]); })
-	.style("fill", function(d) { return colorScale1((d["Score"] / 1) * 100); })
+	.attr("r", function(d){ return rScaleP(Math.abs(((d[2012] - povertyGap125Avgs["world"])/povertyGap125Avgs["world"])* 100)); })
+	.style("fill", function(d){
+                  	 return colorScalePG(d["ID"]);
+                  })
 	.style("opacity", 1)
 	.on("mouseover", function (d) {
 		d3.select("#location").text(d["Country"]);
+		d3.select("#Value").text(Math.abs(((d[2012] - povertyGap125Avgs["world"])/povertyGap125Avgs["world"]) * 100));
     }); 
 
-    circles4 = svg.selectAll(".plot3").data(povertyGap51);
+    circles4 = svg.selectAll(".plot3").data(povertyGap5N);
     circles4.enter().append("circle")
 	.attr("class", "plot")
 	.attr("cx", function(d) {
 	    if(d["ID"] == 1 || d["ID"] == 5 || d["ID"] == 9) {
-	    	return "300px";
+	    	return "250px";
 	    } 
 	    else if(d["ID"] == 2 || d["ID"] == 6 || d["ID"] == 10) {
-            return "500px";
+            return "450px";
 	    }
 	    else if(d["ID"] == 3 || d["ID"] == 7 || d["ID"] == 11) {
-	    	return "700px";
+	    	return "650px";
 	    }
 	    else if(d["ID"] == 4 || d["ID"] == 8 || d["ID"] == 12) {
-	    	return "900px";
+	    	return "850px";
 	    }	
 
 	})
@@ -287,19 +309,32 @@ function pg() {
 	    	return "120px";
 	    } 
 	    else if(d["ID"] < 9) {
-            return "220px";
+            return "320px";
 	    }
 	    else {
-	    	return "320px";
+	    	return "520px";
 	    }	
 	})
-	.attr("r", function(d){ return rScaleP5(d[2012]); })
-	.style("fill", function(d) { return colorScale1((d["Score"] / 1) * 100); })
+	.attr("r", function(d){ return rScaleP(Math.abs(((d[2012] - povertyGap5Avgs["world"])/povertyGap5Avgs["world"]) * 100)); })
+	 .style("fill", function(d){
+                  	 return colorScalePG(d["ID"]);
+                  })
 	.style("opacity", 1)
 	.on("mouseover", function (d) {
 		d3.select("#location").text(d["Country"]);
+		d3.select("#Value").text(Math.abs(((d[2012] - povertyGap5Avgs["world"])/povertyGap5Avgs["world"]) * 100));
     }); 
+
+ 
+
+
+
+
+
 }
+
+
+
 
 function mr() {
    
@@ -494,43 +529,38 @@ function gdp() {
 
 }
 
-function mal() {
- /*   genderGap1.forEach(function(t){
-    edRanks.forEach(function(d){
-      if(t["Country"]==d["Country"]) {
-         t[2012] = d[2012];
-      }
-    }); 
-    });  */
-
-    
+function mal() { 
+    circles1.remove();
     var rScale = d3.scale.linear().domain([5, 50]).range([5, 20]);
+    var colorScaleMal = d3.scale.linear().domain([5, 25, 45]).range(["#d8b365", "#f5f5f5", "#5ab4ac"]);
 
-    circles4 = svg.selectAll(".plot4").data(undernourishment1);
-    circles4.enter().append("circle")
+    circles5 = svg.selectAll(".plot5").data(undernourishment1);
+    circles5.enter().append("circle")
 	.attr("class", "plot")
 	.attr("cx", "200px")
 	.attr("cy", function(d){
 		return d["ID"]*50 + "px";
 	})
 	.attr("r", function(d) { return rScale(d[2012]); })
-	.style("fill", function(d) { return colorScale1((d["Score"] / 1) * 100); })
+	.attr("country", function(d) { return d["Country"]; })
+	.style("fill", function(d) { return colorScaleMal(d[2012]); })
 	.style("opacity", 1)
 	.on("mouseover", function (d) {
 		d3.select("#location").text(d["Country"]);
     });
 
+    
     var rScaleE = d3.scale.linear().domain([0, 10]).range([5, 20]);
+
+    
 
     circles.each(function (d, i) {
             if (isIncludedMal(d3.select(this).attr("country"))) {
-            	  console.log(d["Country"]);
-            	  console.log(d["MalID"]);
+            	  console.log(d3.select(this).attr("MID"));
                   d3.select(this).transition().duration(1000)
                   .attr("cx", "500px")  
                   .attr("cy", function(d){
-                  	circles4.forEach 
-		 			return d["MalID"]*50 + "px";
+					  return d["MID"]*50 + "px";
 				  })
                   .attr("r", function(d) { return rScaleE(d[2012]); });
             }
@@ -540,8 +570,14 @@ function mal() {
               .attr("cx", "0px");  
 
             }
-            
-    });
+
+            d3.select(this).append("text")
+            .attr("x", function(d){ return d3.select(this).attr("cx"); })
+            .text(function(d){ 
+                  	return d3.select(this).attr("country");
+            });
+             
+    });  
 }
 
 </script>
