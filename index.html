@@ -12,7 +12,7 @@
 <style>
 body { 
   font-family: "Open Sans"; 
-  background-color: black;
+  background-color: white;
   } 
 div { 
   margin: 5px; 
@@ -43,7 +43,7 @@ span {
   color: orange;
 }
 svg { 
-  background-color: black;
+  background-color: white;
 }
 h1 {
   font-weight: bolder;
@@ -94,6 +94,21 @@ text {
   <div id='GDP'>GDP Growth: </div><br>
 </span>
 <div id='rank'></div>
+
+<button onclick="gg()">Gender Gap</button>
+<button onclick="pg()">Poverty Gap</button>
+<button onclick="mr()">Mortality Rate</button>
+<button onclick="gdp()">GDP Growth</button>
+<button onclick="mal()">Malnutrition</button>
+<div>
+   <span id="location"></span>
+</div>
+<div id="plot">
+  <div id="plot1"></div>
+  <div id="plot2"></div>
+
+</div>
+
 
 <script>
 // svg parameters
@@ -272,6 +287,7 @@ function drawData(){
 draw();
 
 </script>
+<script src="part2.js"></script>
 
 </body>
 </html>
