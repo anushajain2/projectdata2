@@ -94,26 +94,25 @@ text {
   <div id='GDP'>GDP Growth: </div><br>
 </span>
 <div id='rank'></div>
-
+<div>
 <button onclick="gg()">Gender Gap</button>
 <button onclick="pg()">Poverty Gap</button>
 <button onclick="mr()">Mortality Rate</button>
 <button onclick="gdp()">GDP Growth</button>
 <button onclick="mal()">Malnutrition</button>
+</div>
 <div>
    <span id="location"></span>
 </div>
 <div id="plot">
   <div id="plot1"></div>
   <div id="plot2"></div>
-
 </div>
-
-
+<script src="part2.js"></script>
 <script>
 // svg parameters
-var width = 960,
-    height = 600;
+var w = 960,
+    h = 600;
 
 // set up world map
 var projection = d3.geo.mercator();
@@ -128,11 +127,12 @@ var digitScale = d3.scale.category20c()
 // that diverge at 0.
 var populationScale = d3.scale.linear().domain([0, 10]).range(["red", "green"]);
 
-var svg = d3.select("#map").append("svg")
-    .attr("width", width)
-    .attr("height", height);
+var map = d3.select("#map").append("svg")
+    .attr('class','mapsvg')
+    .attr("width", w)
+    .attr("height", h);
 var active = d3.select(null);
-var g = svg.append("g");
+var gMap = map.append("g");
 var worldObjects;
 var temp;
 var gD;
@@ -148,7 +148,7 @@ function draw() {
     //worldObjects = world;
     worldObjects = topojson.feature(world, world.objects.countries).features
 
-    countryPaths = g.selectAll("path")
+    countryPaths = gMap.selectAll("path")
     .data(worldObjects).enter()
     .append("path")
     .attr("class", "country")
@@ -161,7 +161,7 @@ function draw() {
     .style("stroke", "white")
     .on("click", clicked);
     
-    g.append("path")
+    gMap.append("path")
           .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
           .attr("class", "mesh")
           .attr("d", path);
@@ -171,7 +171,7 @@ function draw() {
 
 function clicked(d) {
   if (active.node() === this) return reset();
-  svg.selectAll('text').remove();
+  map.selectAll('text').remove();
   active.classed("active", false);
   active = d3.select(this).classed("active", true);
 
@@ -186,17 +186,17 @@ function clicked(d) {
       dy = bounds[1][1] - bounds[0][1],
       x = (bounds[0][0] + bounds[1][0]) / 2,
       y = (bounds[0][1] + bounds[1][1]) / 2,
-      scale = .4 / Math.max(dx / width, dy / height),
+      scale = .4 / Math.max(dx / w, dy / h),
       //translate = [(width / 2 - scale * x) - 200, height / 2 - scale * y];
       translate = [-1 * bounds[0][0] * scale, (-1 * bounds[0][1] * scale) + 100]
 
-  g.transition()
+  gMap.transition()
       .duration(500)
       .style("stroke-width", 1.5 / scale + "px")
       .attr("transform", "translate(" + translate + ")scale(" + scale + ")")
 
 
-  svg.selectAll('text')
+  map.selectAll('text')
     .data(active)
     .enter()
     .append('text')
@@ -205,20 +205,10 @@ function clicked(d) {
     .attr('y', 0)
     .attr('font-size', '40px')
 
-  // g.append('text')
-  //   .attr('class', 'rank')
-  //   .text("Average Education Index: " + edRanksAvgs[isoCodes[0][d.id]])
-  //   .attr('x', bounds[0][0])
-  //   .attr('y', bounds[1][1]+80/scale)
-  //   .attr("font-size", 30 / scale + 'px')
 
-
-  d3.select('svg').transition().duration(500)
+  map.transition().duration(500)
     .attr('width', '400px')
     .attr('height', '400px');
-  // d3.select('#map').transition().duration(500)
-  //   .attr('width', '400px')
-  //   .attr('height', '300px');
   d3.select('#rank').html("Average Education Index: " + edRanksAvgs[isoCodes[0][d.id]]);
 
   gD = d3.select('#gender');
@@ -233,22 +223,6 @@ function clicked(d) {
   cD.html(cD.html() + childMortAvgs[isoCodes[0][d.id]] + '%');
   dD = d3.select('#GDP');
   dD.html(dD.html() + GDPGrowthAvgs[isoCodes[0][d.id]] + '%');
-  // g.append('text')
-  //   .attr('class', 'details')
-  //   .attr('x', bounds[1][0]+50/scale)
-  //   .attr('y', bounds[0][1])
-  //   .attr("font-size", 30 / scale + 'px')
-  //   .append('span').text('Gender Gap: ' + 7)
-  //   .append("br")
-  //   .append('span').text('Poverty Gap ($1.25): ' + 7)
-  //   .append("br")
-  //   .append('span').text('Poverty Gap ($5): ' + 7)
-  //   .append("br")
-  //   .append('span').text('Undernourishment: ' + 7)
-  //   .append("br")
-  //   .append('span').text('Child Mortality Rate: ' + 7)
-  //   .append("br")
-  //   .append('span').text('GDP Growth Rate: ' + 7)
 
   drawData();
 }
@@ -258,14 +232,14 @@ function reset() {
   active.classed("active", false);
   active = d3.select(null);
 
-  g.transition()
+  gMap.transition()
       .duration(500)
       .style("stroke-width", "1.5px")
       .attr("transform", "");
-  svg.transition().duration(500).attr('width',"960px").attr('height', '600px');
-  d3.select('#map').transition().duration(500).attr('width',"960px").attr('height', '600px');
+  map.transition().duration(500).attr('width',w).attr('height', h);
+  d3.select('#map').transition().duration(500).attr('width',w).attr('height', h);
 
-  svg.selectAll('text').remove();
+  map.selectAll('text').remove();
 
   temp.transition().delay(500).style('display', 'inline');
 
@@ -287,7 +261,6 @@ function drawData(){
 draw();
 
 </script>
-<script src="part2.js"></script>
 
 </body>
 </html>

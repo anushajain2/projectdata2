@@ -1,43 +1,3 @@
-<html>
-<head>
-  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-<!-- Load the d3 library. -->
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="http://d3js.org/topojson.v1.min.js"></script>
-
-<!-- include any scripts you write here! -->
-<script src="data.js"></script>
-
-<style>
-/* put a border around the svg element so we can see the coordinate system better. */
-#plot {
-  
-}
-
-svg { border: solid black 1px; }
-.axis path { fill: none; stroke: black;}
-.axis line { stroke: black; }
-text { font-size: small; font-family: "Open Sans", Calibri; opacity: 0.3; text-anchor: middle; dominant-baseline: central; }
-text:hover { fill: blue; opacity: 1.0; font-weight: bold; font-size: xx-large; }
-</style>
-</head>
-<body>
-<button onclick="gg()">Gender Gap</button>
-<button onclick="pg()">Poverty Gap</button>
-<button onclick="mr()">Mortality Rate</button>
-<button onclick="gdp()">GDP Growth</button>
-<button onclick="mal()">Malnutrition</button>
-
-<div id="plot">
-  <div id="plot1"></div>
-  <div id="plot2"></div>
-    
-  	<span id="location"></span>
-	<span id="Value"></span>
-
-  
-</div>
-<script>
 // svg parameters
 var width = 960,
     height = 700;
@@ -129,54 +89,57 @@ d3.csv("GenderGap1.csv", function (error, data) {
 });
 
 
+
 function gg() {
- xScale = d3.scale.linear()
-	.domain([0, 10]).range([padding, width - padding]);
-	
- yScale = d3.scale.linear()
-	.domain([0, 10]).range([height - padding, padding]);
- 
 
-
- //Represent countries using Education Index
- // Will add transitions to this, and use in every visualization.
- circles = svg.selectAll(".plot1").data(edRanks);
- circles.enter().append("circle")
-	.attr("class", "plot")
-	.attr("cx", function(d) { return xScale(d[2012]); })
-	.attr("cy", "100px")
-	.attr("r", 10)
-	.attr("country", function(d) { return d["Country"] })
-	.attr("value", function(d) { return d[2012]; })
-	.attr("MID", function(d){ return d["MID"]; })
-	.style("fill", function(d) { return colorScale((d[2012] / 10) * 100); })
-	.style("opacity", 1)
-	.on("mouseover", function (d) {
+	xScale = d3.scale.linear()
+		.domain([0, 10]).range([padding, width - padding]);
 		
-		d3.select("#location").text(d["Country"]);
-		d3.select("#Value").text(d[2012]);
-    });
+	 yScale = d3.scale.linear()
+		.domain([0, 10]).range([height - padding, padding]);
 
- genderGap1.forEach(function(t){
-    edRanks.forEach(function(d){
-      if(t["Country"]==d["Country"]) {
-         t[2012] = d[2012];
-      }
-   });
-   
- });
+	//Represent countries using Education Index
+	 // Will add transitions to this, and use in every visualization.
+	 circles = svg.selectAll(".plot1").data(edRanks);
+	 circles.enter().append("circle")
+		.attr("class", "plot")
+		.attr("cx", function(d) { return xScale(d[2012]); })
+		.attr("cy", "100px")
+		.attr("r", 10)
+		.attr("country", function(d) { return d["Country"] })
+		.attr("value", function(d) { return d[2012]; })
+		.attr("MID", function(d){ return d["MID"]; })
+		.style("fill", function(d) { return colorScale((d[2012] / 10) * 100); })
+		.style("opacity", 1)
+		.on("mouseover", function (d) {
+			
+			d3.select("#location").text(d["Country"]);
+			d3.select("#Value").text(d[2012]);
+	    });
 
- circles1 = svg.selectAll(".plot2").data(genderGap1);
- circles1.enter().append("circle")
-	.attr("class", "plot")
-	.attr("cx", function(d) { return xScale(d[2012]); })
-	.attr("cy", "200px")
-	.attr("r", 10)
-	.style("fill", function(d) { return colorScale1((d["Score"] / 1) * 100); })
-	.style("opacity", 1)
-	.on("mouseover", function (d) {
-		d3.select("#location").text(d["Country"]);
- });
+	     genderGap1.forEach(function(t){
+	        edRanks.forEach(function(d){
+	          if(t["Country"]==d["Country"]) {
+	             t[2012] = d[2012];
+	          }
+	       });
+	       
+	     });
+
+	     circles1 = svg.selectAll(".plot2").data(genderGap1);
+	     circles1.enter().append("circle")
+	    	.attr("class", "plot")
+	    	.attr("cx", function(d) { 
+	    		if (isNaN(d[2012])) { return '-10px';}
+	    		return xScale(d[2012]); 
+	    	})
+	    	.attr("cy", "200px")
+	    	.attr("r", 10)
+	    	.style("fill", function(d) { return colorScale1((d["Score"] / 1) * 100); })
+	    	.style("opacity", 1)
+	    	.on("mouseover", function (d) {
+	    		d3.select("#location").text(d["Country"]);
+	     });
 
 }
 
@@ -279,7 +242,7 @@ function pg() {
 	    	return "480px";
 	    }	
 	})
-	.attr("r", function(d){ return rScaleP(Math.abs(((d[2012] - povertyGap125Avgs["world"])/povertyGap125Avgs["world"])* 100)); })
+	.attr("r", function(d){ if (isNaN(d[2012])) { return 0;} return rScaleP(Math.abs(((d[2012] - povertyGap125Avgs["world"])/povertyGap125Avgs["world"])* 100)); })
 	.style("fill", function(d){
                   	 return colorScalePG(d["ID"]);
                   })
@@ -347,13 +310,13 @@ function mr() {
 		d3.csv("ChildUnder5MortPer1000Prob.csv", function (error, data) {
 			childMort1 = data;
 		xScale = d3.scale.linear()
-			.domain([1, 7]).range([padding1, width1 - padding1]);
+			.domain([1, 7]).range([padding, width - padding]);
 			
 		yScale = d3.scale.linear()
-			.domain([1, 240]).range([height1 - padding1 - 100, padding1+100]);
+			.domain([1, 240]).range([height - padding - 100, padding+100]);
 
 		edScale = d3.scale.linear()
-			.domain([0, 10]).range([height1 - padding1 - 100, padding1+100]);
+			.domain([0, 10]).range([height - padding - 100, padding+100]);
 
 
 		
@@ -362,7 +325,7 @@ function mr() {
 
 
 
-		circles21 = svg1.selectAll(".plot7").data(childMort1);
+		circles21 = svg.selectAll(".plot7").data(childMort1);
 		circles21.enter().append("circle")
 			.attr("class", "mplot")
 			.attr("cx", function(d) { return xScale(1); })
@@ -374,7 +337,7 @@ function mr() {
 				d3.select("#location").text(d["Country"]);
 		});
 		 
-		lines21 = svg1.selectAll("line1").data(childMort1);
+		lines21 = svg.selectAll("line1").data(childMort1);
 		lines21.enter().append("line")
 			.attr('class', 'mplot')
 			.attr("x1", function(d) { return xScale(1); })
@@ -386,7 +349,7 @@ function mr() {
 				d3.select("#location").text(d["Country"] + "'s Child Mortality Probability in 2000: " + d[2000]);
 			});
 
-		circles22 = svg1.selectAll(".plot6").data(childMort1);
+		circles22 = svg.selectAll(".plot6").data(childMort1);
 		circles22.enter().append("circle")
 			.attr("class", "mplot")
 			.attr("cx", function(d) { return xScale(2); })
@@ -399,7 +362,7 @@ function mr() {
 		});
 
 		
-		lines22 = svg1.selectAll("line2").data(childMort1);
+		lines22 = svg.selectAll("line2").data(childMort1);
 		lines22.enter().append("line")
 			.attr('class', 'mplot')
 			.attr("x1", function(d) { return xScale(2); })
@@ -411,7 +374,7 @@ function mr() {
 				d3.select("#location").text(d["Country"] + "'s Child Mortality Probability in 2005: " + d[2005])
 			});
 
-		circles23 = svg1.selectAll(".plot5").data(childMort1);
+		circles23 = svg.selectAll(".plot5").data(childMort1);
 		circles23.enter().append("circle")
 			.attr("class", "mplot")
 			.attr("cx", function(d) { return xScale(3); })
@@ -423,7 +386,7 @@ function mr() {
 				d3.select("#location").text(d["Country"]);
 		});
 
-		lines23 = svg1.selectAll("line3").data(childMort1);
+		lines23 = svg.selectAll("line3").data(childMort1);
 		lines23.enter().append("line")
 			.attr('class', 'mplot')
 			.attr("x1", function(d) { return xScale(3); })
@@ -437,7 +400,7 @@ function mr() {
 			});
 
 
-		circles24 = svg1.selectAll(".plot4").data(childMort1);
+		circles24 = svg.selectAll(".plot4").data(childMort1);
 		circles24.enter().append("circle")
 			.attr("class", "mplot")
 			.attr("cx", function(d) { return xScale(4); })
@@ -450,7 +413,7 @@ function mr() {
 		});
 
 		
-		lines24 = svg1.selectAll("line4").data(childMort1);
+		lines24 = svg.selectAll("line4").data(childMort1);
 		lines24.enter().append("line")
 			.attr('class', 'mplot')
 			.attr("x1", function(d) { return xScale(4); })
@@ -464,7 +427,7 @@ function mr() {
 
 		 
 
-		circles25 = svg1.selectAll(".plot3").data(childMort1);
+		circles25 = svg.selectAll(".plot3").data(childMort1);
 		circles25.enter().append("circle")
 			.attr("class", "mplot")
 			.attr("cx", function(d) { return xScale(5); })
@@ -476,7 +439,7 @@ function mr() {
 				d3.select("#location").text(d["Country"]);
 		});
 
-		lines25 = svg1.selectAll("line5").data(childMort1);
+		lines25 = svg.selectAll("line5").data(childMort1);
 		lines25.enter().append("line")
 			.attr('class', 'mplot')
 			.attr("x1", function(d) { return xScale(5); })
@@ -489,7 +452,7 @@ function mr() {
 			});
 
 
-		circles26 = svg1.selectAll(".plot2").data(childMort1);
+		circles26 = svg.selectAll(".plot2").data(childMort1);
 		circles26.enter().append("circle")
 			.attr("class", "mplot")
 			.attr("cx", function(d) { return xScale(6); })
@@ -501,7 +464,7 @@ function mr() {
 				d3.select("#location").text(d["Country"]);
 		});
 
-		lines26 = svg1.selectAll("line6").data(childMort1);
+		lines26 = svg.selectAll("line6").data(childMort1);
 		lines26.enter().append("line")
 			.attr('class', 'mplot')
 			.attr("x1", function(d) { return xScale(6); })
@@ -513,7 +476,7 @@ function mr() {
 				d3.select("#location").text(d["Country"] + "'s Child Mortality Probability in 2011: " + d[2011])
 			});
 
-		circles27 = svg1.selectAll(".plot1").data(childMort1);
+		circles27 = svg.selectAll(".plot1").data(childMort1);
 		circles27.enter().append("circle")
 			.attr("class", "mplot")
 			.attr("cx", function(d) { return xScale(7); })
@@ -526,7 +489,7 @@ function mr() {
 		});
 
 
-		circlesEd1 = svg1.selectAll(".plot8").data(edRanksM);
+		circlesEd1 = svg.selectAll(".plot8").data(edRanksM);
 		circlesEd1.enter().append("circle")
 			.attr("class", "edplot")
 			.attr("cx", function(d) { return xScale(1); })
@@ -535,7 +498,7 @@ function mr() {
 			.style("fill", "orange")
 			.style("opacity", .25);
 
-			circlesEd2 = svg1.selectAll(".plot9").data(edRanksM);
+			circlesEd2 = svg.selectAll(".plot9").data(edRanksM);
 			circlesEd2.enter().append("circle")
 			.attr("class", "edplot")
 			.attr("cx", function(d) { return xScale(7); })
@@ -544,7 +507,7 @@ function mr() {
 			.style("fill", "orange")
 			.style("opacity", .25);
 
-		linesEd = svg1.selectAll("line7").data(edRanksM);
+		linesEd = svg.selectAll("line7").data(edRanksM);
 		linesEd.enter().append("line")
 			.attr('class', 'edplot')
 			.attr("x1", function(d) { return xScale(1); })
@@ -554,9 +517,9 @@ function mr() {
 			.style("stroke", "orange")
 			.style("opacity", .25);
 
-			var active = d3.selectAll('.mplot')
-			var inactive = d3.selectAll('.edplot')
-			svg1.append('circle')
+			var active1 = d3.selectAll('.mplot')
+			var inactive1 = d3.selectAll('.edplot')
+			svg.append('circle')
 				.attr("class", "switch")
 				.attr("cx", 20)
 				.attr("cy", 20)
@@ -564,11 +527,11 @@ function mr() {
 				.style("fill", "green")
 				.style("opacity", 1)
 				.on('click', function () {
-					active.style('opacity', .25);
-					inactive.style('opacity', 1);
-					var tempstat = active;
-					active = inactive;
-					inactive = tempstat;
+					active1.style('opacity', .25);
+					inactive1.style('opacity', 1);
+					var tempstat = active1;
+					active1 = inactive1;
+					inactive1 = tempstat;
 				})
 				.append('text')
 				.text('click me')
@@ -602,7 +565,7 @@ function mr() {
 
 
 		yScaleMort = d3.scale.linear()
-			.domain([0, 10]).range([padding1, width1 - padding1]);
+			.domain([0, 10]).range([padding, width - padding]);
 
 		 /* circles.transition().duration(1000)
 			.attr("cx", function(d) { return xScale(7); })
@@ -620,7 +583,7 @@ function gdp() {
 }
 
 function mal() { 
-    circles1.remove();
+    //circles1.remove();
     var rScale = d3.scale.linear().domain([5, 50]).range([5, 20]);
     var colorScaleMal = d3.scale.linear().domain([5, 25, 45]).range(["#d8b365", "#f5f5f5", "#5ab4ac"]);
 
@@ -669,10 +632,3 @@ function mal() {
              
     });  
 
-}
-
-gg();
-
-</script>
-</body>
-</html>
