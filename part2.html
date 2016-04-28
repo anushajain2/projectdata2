@@ -1,0 +1,549 @@
+<html>
+<head>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<!-- Load the d3 library. -->
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+
+<!-- include any scripts you write here! -->
+<script src="data.js"></script>
+
+<style>
+/* put a border around the svg element so we can see the coordinate system better. */
+#plot {
+  
+}
+
+svg { border: solid black 1px; }
+.axis path { fill: none; stroke: black;}
+.axis line { stroke: black; }
+text { font-size: small; font-family: "Open Sans", Calibri; opacity: 0.3; text-anchor: middle; dominant-baseline: central; }
+text:hover { fill: blue; opacity: 1.0; font-weight: bold; font-size: xx-large; }
+</style>
+</head>
+<body>
+<button onclick="gg()">Gender Gap</button>
+<button onclick="pg()">Poverty Gap</button>
+<button onclick="mr()">Mortality Rate</button>
+<button onclick="gdp()">GDP Growth</button>
+<button onclick="mal()">Malnutrition</button>
+<div>
+	 <span id="location"></span>
+</div>
+<div id="plot">
+  <div id="plot1"></div>
+  <div id="plot2"></div>
+
+</div>
+<script>
+// svg parameters
+var width = 960,
+    height = 700;
+    padding = 50;
+
+var MalID;
+
+var circles;
+var circles1;
+var circles21;
+var circles22;
+var circles4;
+var lines2;
+var lines21;
+var lines22;
+var lines23;
+
+var edRanksM;
+var childMort1;
+var povertyGap51;
+var povertyGap251;
+var undernourishment1;
+
+var svg = d3.select("#plot").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+var g = svg.append("g");
+
+
+var colorScale = d3.scale.linear().domain([0, 50, 100]).range(["#d8b365", "#f5f5f5", "#5ab4ac"]);
+
+var colorScale1 = d3.scale.linear().domain([47, 68, 89]).range(["#d8b365", "#f5f5f5", "#5ab4ac"]);
+
+ d3.csv("PovertyGapDollar25RanksNew.csv", function (error, data) {
+     povertyGap251 = data;
+   });
+
+d3.csv("PovertyGap5DollarsADayRanksNew.csv", function (error, data) {
+     povertyGap51 = data;
+});
+
+d3.csv("PovertyGap5DollarsADayRanksNew.csv", function (error, data) {
+     povertyGap51 = data;
+});
+
+
+d3.csv("UndernourishmentPrevalenceRanksNew.csv", function (error, data) {
+     undernourishment1= data;
+});
+
+
+
+function isIncluded(country) {
+	  var count=0;
+   	  edRanks.forEach(function(d) {
+         povertyGap51.forEach(function(p) {
+            if(d["Country"]==p["Country"] && d["Country"]==country) {
+            	count = count +1;
+
+            }
+         });
+   	  });
+   	  return count >=1;
+}
+
+function MalIDforCircle(country){
+   	  edRanks.forEach(function(d) {
+         undernourishment1.forEach(function(p) {
+            if(d["Country"]==p["Country"] && d["Country"]==country) {
+            	MalID = p["ID"];
+            	
+            }
+            else {
+            	MalID = 0;
+            }
+         });
+   	  });
+   	  return MalID;
+}
+
+function isIncludedMal(country) {
+	  var count=0;
+   	  edRanks.forEach(function(d) {
+         undernourishment1.forEach(function(p) {
+            if(d["Country"]==p["Country"] && d["Country"]==country) {
+            	count = count +1;
+
+            }
+         });
+   	  });
+   	  return count >=1;
+}
+
+
+
+d3.csv("GenderGap1.csv", function (error, data) {
+  genderGap1 = data;
+  
+});
+
+function gg() {
+ xScale = d3.scale.linear()
+	.domain([0, 10]).range([padding, width - padding]);
+	
+ yScale = d3.scale.linear()
+	.domain([0, 10]).range([height - padding, padding]);
+
+ //Represent countries using Education Index
+ // Will add transitions to this, and use in every visualization.
+ circles = svg.selectAll(".plot1").data(edRanks);
+ circles.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) { return xScale(d[2012]); })
+	.attr("cy", "100px")
+	.attr("r", 10)
+	.attr("country", function(d) { return d["Country"] })
+	.attr("MalID", function(d){ 
+			return MalIDforCircle(d["Country"]);
+	})
+	.style("fill", function(d) { return colorScale((d[2012] / 10) * 100); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+ });
+
+ genderGap1.forEach(function(t){
+    edRanks.forEach(function(d){
+      if(t["Country"]==d["Country"]) {
+         t[2012] = d[2012];
+      }
+   });
+   
+ });
+
+ circles1 = svg.selectAll(".plot2").data(genderGap1);
+ circles1.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) { return xScale(d[2012]); })
+	.attr("cy", "200px")
+	.attr("r", 10)
+	.style("fill", function(d) { return colorScale1((d["Score"] / 1) * 100); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+ });
+
+}
+
+function pg() {
+   var size = 0;
+   var size2 = 0;
+   var size3 = 0;
+
+   circles1.remove();
+   circles.each(function (d, i) {
+            if (isIncluded(d3.select(this).attr("country"))) {
+              size = size + 200;
+              if(size < 1000) {
+                  d3.select(this).transition().duration(1000)
+                  .attr("cx", size + "px")  
+                  .attr("cy", "100px")
+                  .attr("r", 20);
+              }
+              else if(size < 1800){
+              	  size2 = size2 + 200;
+                  d3.select(this).transition().duration(1000)
+                  .attr("cx", size2 + "px")  
+                  .attr("cy", "200px")
+                  .attr("r", 20);
+
+              }
+              else {
+              	  size3 = size3 + 200;
+                  d3.select(this).transition().duration(1000)
+                  .attr("cx", size3 + "px")  
+                  .attr("cy", "300px")
+                  .attr("r", 20); 
+              }
+
+            }
+            
+            else { 
+              d3.select(this).transition().duration(1000)
+              .attr("cx", "0px");  
+
+            }
+            
+    });
+
+    var rScaleP2 = d3.scale.linear().domain([0, 5]).range([5, 20]);
+    var rScaleP5 = d3.scale.linear().domain([0, 40]).range([5, 20]);
+
+    circles3 = svg.selectAll(".plot3").data(povertyGap251);
+    circles3.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) {
+	    if(d["ID"] == 1 || d["ID"] == 5 || d["ID"] == 9) {
+	    	return "300px";
+	    } 
+	    else if(d["ID"] == 2 || d["ID"] == 6 || d["ID"] == 10) {
+            return "500px";
+	    }
+	    else if(d["ID"] == 3 || d["ID"] == 7 || d["ID"] == 11) {
+	    	return "700px";
+	    }
+	    else if(d["ID"] == 4 || d["ID"] == 8 || d["ID"] == 12) {
+	    	return "900px";
+	    }	
+
+	})
+	.attr("cy", function(d) {
+		if(d["ID"] < 5) {
+	    	return "80px";
+	    } 
+	    else if(d["ID"] < 9) {
+            return "180px";
+	    }
+	    else {
+	    	return "280px";
+	    }	
+	})
+	.attr("r", function(d){ return rScaleP2(d[2012]); })
+	.style("fill", function(d) { return colorScale1((d["Score"] / 1) * 100); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+    }); 
+
+    circles4 = svg.selectAll(".plot3").data(povertyGap51);
+    circles4.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) {
+	    if(d["ID"] == 1 || d["ID"] == 5 || d["ID"] == 9) {
+	    	return "300px";
+	    } 
+	    else if(d["ID"] == 2 || d["ID"] == 6 || d["ID"] == 10) {
+            return "500px";
+	    }
+	    else if(d["ID"] == 3 || d["ID"] == 7 || d["ID"] == 11) {
+	    	return "700px";
+	    }
+	    else if(d["ID"] == 4 || d["ID"] == 8 || d["ID"] == 12) {
+	    	return "900px";
+	    }	
+
+	})
+	.attr("cy", function(d) {
+		if(d["ID"] < 5) {
+	    	return "120px";
+	    } 
+	    else if(d["ID"] < 9) {
+            return "220px";
+	    }
+	    else {
+	    	return "320px";
+	    }	
+	})
+	.attr("r", function(d){ return rScaleP5(d[2012]); })
+	.style("fill", function(d) { return colorScale1((d["Score"] / 1) * 100); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+    }); 
+}
+
+function mr() {
+   
+  d3.csv("EducationIndexRanksM.csv", function (error, data) {
+    edRanksM = data;
+  });
+
+  d3.csv("ChildUnder5MortPer1000Prob.csv", function (error, data) {
+    childMort1 = data;
+  });
+
+  xScale = d3.scale.linear()
+	.domain([1, 7]).range([padding, width - padding]);
+	
+  yScale = d3.scale.linear()
+	.domain([1, 240]).range([height - padding, padding]);
+
+  
+  var colorScaleM = d3.scale.linear().domain([1, 120, 240]).range(["#5ab4ac", "#f5f5f5", "#d8b365"]);
+
+  circles21 = svg.selectAll(".plot7").data(childMort1);
+  circles21.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) { return xScale(1); })
+	.attr("cy", function(d) { return yScale(d[2000]); })
+	.attr("r", 3)
+	.style("fill", function(d) { return colorScaleM(d[2012]); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+  });
+ 
+  lines21 = svg.selectAll("line1").data(childMort1);
+  lines21.enter().append("line")
+	.attr("x1", function(d) { return xScale(1); })
+	.attr("y1", function(d) { return yScale(d[2000]); })
+	.attr("x2", function(d) { return xScale(1); })
+	.attr("y2", function(d) { return yScale(d[2000]); })
+	.style("stroke", function(d) { return colorScaleM(d[2005]); });
+
+  circles22 = svg.selectAll(".plot6").data(childMort1);
+  circles22.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) { return xScale(2); })
+	.attr("cy", function(d) { return yScale(d[2005]); })
+	.attr("r", 3)
+	.style("fill", function(d) { return colorScaleM(d[2012]); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+  });
+
+  
+  lines22 = svg.selectAll("line2").data(childMort1);
+  lines22.enter().append("line")
+	.attr("x1", function(d) { return xScale(2); })
+	.attr("y1", function(d) { return yScale(d[2005]); })
+	.attr("x2", function(d) { return xScale(2); })
+	.attr("y2", function(d) { return yScale(d[2005]); })
+	.style("stroke", function(d) { return colorScaleM(d[2008]); });
+
+  circles23 = svg.selectAll(".plot5").data(childMort1);
+  circles23.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) { return xScale(3); })
+	.attr("cy", function(d) { return yScale(d[2008]); })
+	.attr("r", 3)
+	.style("fill", function(d) { return colorScaleM(d[2012]); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+  });
+
+  lines23 = svg.selectAll("line3").data(childMort1);
+  lines23.enter().append("line")
+	.attr("x1", function(d) { return xScale(3); })
+	.attr("y1", function(d) { return yScale(d[2008]); })
+	.attr("x2", function(d) { return xScale(3); })
+	.attr("y2", function(d) { return yScale(d[2008]); })
+	.style("stroke", function(d) { return colorScaleM(d[2009]); });
+
+
+  circles24 = svg.selectAll(".plot4").data(childMort1);
+  circles24.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) { return xScale(4); })
+	.attr("cy", function(d) { return yScale(d[2009]); })
+	.attr("r", 3)
+	.style("fill", function(d) { return colorScaleM(d[2012]); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+  });
+
+  
+  lines24 = svg.selectAll("line4").data(childMort1);
+  lines24.enter().append("line")
+	.attr("x1", function(d) { return xScale(4); })
+	.attr("y1", function(d) { return yScale(d[2009]); })
+	.attr("x2", function(d) { return xScale(4); })
+	.attr("y2", function(d) { return yScale(d[2009]); })
+	.style("stroke", function(d) { return colorScaleM(d[2010]); });
+
+ 
+
+  circles25 = svg.selectAll(".plot3").data(childMort1);
+  circles25.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) { return xScale(5); })
+	.attr("cy", function(d) { return yScale(d[2010]); })
+	.attr("r", 3)
+	.style("fill", function(d) { return colorScaleM(d[2012]); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+  });
+
+  lines25 = svg.selectAll("line5").data(childMort1);
+  lines25.enter().append("line")
+	.attr("x1", function(d) { return xScale(5); })
+	.attr("y1", function(d) { return yScale(d[2010]); })
+	.attr("x2", function(d) { return xScale(5); })
+	.attr("y2", function(d) { return yScale(d[2010]); })
+	.style("stroke", function(d) { return colorScaleM(d[2011]); });
+
+
+  circles26 = svg.selectAll(".plot2").data(childMort1);
+  circles26.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) { return xScale(6); })
+	.attr("cy", function(d) { return yScale(d[2011]); })
+	.attr("r", 3)
+	.style("fill", function(d) { return colorScaleM(d[2012]); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+  });
+
+  lines26 = svg.selectAll("line6").data(childMort1);
+  lines26.enter().append("line")
+	.attr("x1", function(d) { return xScale(6); })
+	.attr("y1", function(d) { return yScale(d[2011]); })
+	.attr("x2", function(d) { return xScale(6); })
+	.attr("y2", function(d) { return yScale(d[2011]); })
+	.style("stroke", function(d) { return colorScaleM(d[2012]); });
+
+  circles27 = svg.selectAll(".plot1").data(childMort1);
+  circles27.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", function(d) { return xScale(7); })
+	.attr("cy", function(d) { return yScale(d[2012]); })
+	.attr("r", 3)
+	.style("fill", function(d) { return colorScaleM(d[2012]); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+  });
+
+
+  lines26.transition().duration(1000)
+  .attr("x2", function(d) { return xScale(7); })
+  .attr("y2", function(d) { return yScale(d[2012]); })
+  .delay(2000).each("end", lines25.transition().duration(1000)
+  .attr("x2", function(d) { return xScale(6); })
+  .attr("y2", function(d) { return yScale(d[2011]); }))
+  .delay(2000).each("end", lines24.transition().duration(1000)
+  .attr("x2", function(d) { return xScale(5); })
+  .attr("y2", function(d) { return yScale(d[2010]); }))
+  .delay(2000).each("start", lines23.transition().duration(1000)
+  .attr("x2", function(d) { return xScale(4); })
+  .attr("y2", function(d) { return yScale(d[2009]); }))
+  .delay(2000).each("end", lines22.transition().duration(1000)
+  .attr("x2", function(d) { return xScale(3); })
+  .attr("y2", function(d) { return yScale(d[2008]); }))
+  .each("end", lines21.transition().duration(1000)
+  .attr("x2", function(d) { return xScale(2); })
+  .attr("y2", function(d) { return yScale(d[2005]); }));
+
+
+  yScaleMort = d3.scale.linear()
+	.domain([0, 10]).range([padding, width - padding]);
+
+ /* circles.transition().duration(1000)
+	.attr("cx", function(d) { return xScale(7); })
+	.attr("cy", function(d) { return yScaleMort(d[2012]); })
+	.attr("r", 3)
+	.style("fill", "black"); */
+}
+
+function gdp() {
+
+
+}
+
+function mal() {
+ /*   genderGap1.forEach(function(t){
+    edRanks.forEach(function(d){
+      if(t["Country"]==d["Country"]) {
+         t[2012] = d[2012];
+      }
+    }); 
+    });  */
+
+    
+    var rScale = d3.scale.linear().domain([5, 50]).range([5, 20]);
+
+    circles4 = svg.selectAll(".plot4").data(undernourishment1);
+    circles4.enter().append("circle")
+	.attr("class", "plot")
+	.attr("cx", "200px")
+	.attr("cy", function(d){
+		return d["ID"]*50 + "px";
+	})
+	.attr("r", function(d) { return rScale(d[2012]); })
+	.style("fill", function(d) { return colorScale1((d["Score"] / 1) * 100); })
+	.style("opacity", 1)
+	.on("mouseover", function (d) {
+		d3.select("#location").text(d["Country"]);
+    });
+
+    var rScaleE = d3.scale.linear().domain([0, 10]).range([5, 20]);
+
+    circles.each(function (d, i) {
+            if (isIncludedMal(d3.select(this).attr("country"))) {
+            	  console.log(d["Country"]);
+            	  console.log(d["MalID"]);
+                  d3.select(this).transition().duration(1000)
+                  .attr("cx", "500px")  
+                  .attr("cy", function(d){
+                  	circles4.forEach 
+		 			return d["MalID"]*50 + "px";
+				  })
+                  .attr("r", function(d) { return rScaleE(d[2012]); });
+            }
+            
+            else { 
+              d3.select(this).transition().duration(1000)
+              .attr("cx", "0px");  
+
+            }
+            
+    });
+}
+
+</script>
+</body>
+</html>
