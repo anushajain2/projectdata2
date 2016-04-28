@@ -1,146 +1,1 @@
-Country,2012,2000
-New Zealand,9.81,9.65
-Australia,9.71,9.78
-Norway,9.43,9.68
-"Korea, Rep.",9.09,9.06
-Greece,8.96,7.21
-Sweden,8.92,9.67
-Iceland,8.91,8.27
-Ireland,8.87,8.76
-"Taiwan, China",8.87,8.71
-Spain,8.82,8.68
-Finland,8.77,8.31
-Netherlands,8.75,9.03
-United States,8.7,9.04
-Lithuania,8.64,8
-Denmark,8.63,8.99
-Canada,8.61,9.22
-Estonia,8.6,8.61
-Belgium,8.57,9.25
-Japan,8.43,8.58
-Hungary,8.42,8.17
-France,8.26,8.54
-Ukraine,8.26,8.47
-Germany,8.2,8.25
-Czech Republic,8.15,7.56
-Cuba,7.93,6.16
-Poland,7.76,8.11
-Latvia,7.73,7.72
-Italy,7.58,7.07
-Romania,7.55,6.37
-Israel,7.47,8.28
-Slovak Republic,7.42,7.06
-Slovenia,7.42,7.72
-Belarus,7.37,7.51
-Austria,7.33,7.94
-Barbados,7.27,7.08
-United Kingdom,7.27,8.11
-Cyprus,7.23,6.95
-Portugal,6.99,7.14
-Armenia,6.96,7.07
-Kazakhstan,6.91,7.2
-Switzerland,6.9,7.56
-Malta,6.86,6.24
-Chile,6.83,6.47
-Russian Federation,6.79,7.8
-Bahrain,6.78,6.34
-"Hong Kong, China",6.38,6.23
-Argentina,6.36,7
-Bulgaria,6.25,7.31
-Croatia,6.15,5.94
-Uruguay,5.99,6.73
-Serbia,5.98,6.86
-Azerbaijan,5.95,5.84
-Mongolia,5.83,4.86
-United Arab Emirates,5.8,4.44
-Moldova,5.79,6.32
-Bosnia and Herzegovina,5.77,
-Saudi Arabia,5.65,4.28
-Uzbekistan,5.65,4.96
-Brazil,5.61,5.45
-Luxembourg,5.61,6.38
-Jamaica,5.58,5.56
-Jordan,5.55,5.62
-Lebanon,5.51,5.77
-Bolivia,5.49,5.84
-Costa Rica,5.43,4.21
-Guyana,5.43,4.53
-"Venezuela, RB",5.36,3.85
-Kyrgyz Rep,5.32,6.3
-Colombia,5.28,4.48
-Algeria,5.27,3.96
-Fiji,5.27,5.99
-Peru,5.25,5.95
-Oman,5.23,4.22
-Malaysia,5.22,5.41
-Mexico,5.16,4.51
-Panama,5.16,5.79
-"Macedonia, FYR",5.15,5.54
-Singapore,5.09,6.34
-Dominica,4.87,
-South Africa,4.87,4.71
-Trinidad and Tobago,4.84,4.48
-Albania,4.81,5.54
-Tajikistan,4.66,5.08
-Philippines,4.64,5.35
-Georgia,4.61,6.22
-"Iran, Islamic Rep.",4.61,4.42
-Sri Lanka,4.61,4.31
-Tunisia,4.55,3.92
-Ecuador,4.47,3.9
-Mauritius,4.33,3.91
-Paraguay,4.26,3.48
-Thailand,4.23,4.44
-Turkey,4.11,4.05
-China,3.93,3.36
-Botswana,3.92,4.38
-Dominican Republic,3.89,4.47
-Kuwait,3.7,5.17
-El Salvador,3.53,3.76
-Cape Verde,3.49,2.35
-Qatar,3.41,4.85
-"Egypt, Arab Rep.",3.37,4.66
-Indonesia,3.2,2.84
-Honduras,3.13,3.35
-Vietnam,2.99,2.82
-Nicaragua,2.98,3.09
-Namibia,2.71,3.37
-Ghana,2.68,2.64
-Syrian Arab Republic,2.4,2.57
-Swaziland,2.27,2.7
-Guatemala,2.26,1.96
-India,2.26,2.3
-Kenya,2.1,2.39
-Zambia,2.08,1.76
-Morocco,2.07,2.02
-Lao PDR,2.01,1.57
-Zimbabwe,1.99,2.75
-Myanmar,1.88,2.1
-Bangladesh,1.75,2.11
-Guinea,1.75,0.59
-Nepal,1.73,1.43
-Lesotho,1.71,1.67
-Cambodia,1.7,1.41
-Nigeria,1.62,1.95
-"Yemen, Rep.",1.62,1.96
-Pakistan,1.44,1.3
-Cameroon,1.39,1.94
-Senegal,1.32,1.21
-Benin,1.1,1.16
-Uganda,1.09,1.19
-Ethiopia,1.05,0.52
-Mali,1.05,0.66
-Cote d'Ivoire,0.91,1.46
-Madagascar,0.84,0.97
-Sudan,0.84,1.38
-Tanzania,0.83,0.74
-Rwanda,0.77,0.56
-Djibouti,0.73,0.35
-Mauritania,0.71,1.19
-Eritrea,0.69,0.84
-Sierra Leone,0.57,0.9
-Malawi,0.54,0.87
-Angola,0.32,0.28
-Burkina Faso,0.28,0.35
-Mozambique,0.17,0.12
-Haiti,,1.13
+Country,2012,2000,MIDNew Zealand,9.81,9.65,Australia,9.71,9.78,Norway,9.43,9.68,"Korea, Rep.",9.09,9.06,10Greece,8.96,7.21,Sweden,8.92,9.67,Iceland,8.91,8.27,Ireland,8.87,8.76,"Taiwan, China",8.87,8.71,Spain,8.82,8.68,Finland,8.77,8.31,Netherlands,8.75,9.03,United States,8.7,9.04,Lithuania,8.64,8,Denmark,8.63,8.99,Canada,8.61,9.22,Estonia,8.6,8.61,Belgium,8.57,9.25,Japan,8.43,8.58,Hungary,8.42,8.17,France,8.26,8.54,Ukraine,8.26,8.47,Germany,8.2,8.25,Czech Republic,8.15,7.56,Cuba,7.93,6.16,Poland,7.76,8.11,Latvia,7.73,7.72,Italy,7.58,7.07,Romania,7.55,6.37,Israel,7.47,8.28,Slovak Republic,7.42,7.06,Slovenia,7.42,7.72,Belarus,7.37,7.51,Austria,7.33,7.94,Barbados,7.27,7.08,United Kingdom,7.27,8.11,Cyprus,7.23,6.95,Portugal,6.99,7.14,Armenia,6.96,7.07,Kazakhstan,6.91,7.2,Switzerland,6.9,7.56,Malta,6.86,6.24,Chile,6.83,6.47,Russian Federation,6.79,7.8,Bahrain,6.78,6.34,"Hong Kong, China",6.38,6.23,Argentina,6.36,7,Bulgaria,6.25,7.31,Croatia,6.15,5.94,Uruguay,5.99,6.73,Serbia,5.98,6.86,Azerbaijan,5.95,5.84,Mongolia,5.83,4.86,United Arab Emirates,5.8,4.44,Moldova,5.79,6.32,Bosnia and Herzegovina,5.77,,Saudi Arabia,5.65,4.28,Uzbekistan,5.65,4.96,Brazil,5.61,5.45,Luxembourg,5.61,6.38,Jamaica,5.58,5.56,Jordan,5.55,5.62,Lebanon,5.51,5.77,Bolivia,5.49,5.84,Costa Rica,5.43,4.21,Guyana,5.43,4.53,"Venezuela, RB",5.36,3.85,Kyrgyz Rep,5.32,6.3,Colombia,5.28,4.48,Algeria,5.27,3.96,Fiji,5.27,5.99,Peru,5.25,5.95,Oman,5.23,4.22,Malaysia,5.22,5.41,8Mexico,5.16,4.51,9Panama,5.16,5.79,"Macedonia, FYR",5.15,5.54,Singapore,5.09,6.34,Dominica,4.87,,South Africa,4.87,4.71,Trinidad and Tobago,4.84,4.48,Albania,4.81,5.54,Tajikistan,4.66,5.08,Philippines,4.64,5.35,Georgia,4.61,6.22,"Iran, Islamic Rep.",4.61,4.42,Sri Lanka,4.61,4.31,Tunisia,4.55,3.92,Ecuador,4.47,3.9,Mauritius,4.33,3.91,Paraguay,4.26,3.48,Thailand,4.23,4.44,Turkey,4.11,4.05,China,3.93,3.36,Botswana,3.92,4.38,Dominican Republic,3.89,4.47,Kuwait,3.7,5.17,El Salvador,3.53,3.76,Cape Verde,3.49,2.35,Qatar,3.41,4.85,"Egypt, Arab Rep.",3.37,4.66,Indonesia,3.2,2.84,Honduras,3.13,3.35,7Vietnam,2.99,2.82,6Nicaragua,2.98,3.09,Namibia,2.71,3.37,2Ghana,2.68,2.64,Syrian Arab Republic,2.4,2.57,Swaziland,2.27,2.7,Guatemala,2.26,1.96,5India,2.26,2.3,4Kenya,2.1,2.39,Zambia,2.08,1.76,1Morocco,2.07,2.02,Lao PDR,2.01,1.57,Zimbabwe,1.99,2.75,Myanmar,1.88,2.1,Bangladesh,1.75,2.11,Guinea,1.75,0.59,Nepal,1.73,1.43,Lesotho,1.71,1.67,Cambodia,1.7,1.41,Nigeria,1.62,1.95,Yemen,1.62,1.96,Pakistan,1.44,1.3,Cameroon,1.39,1.94,Senegal,1.32,1.21,Benin,1.1,1.16,Uganda,1.09,1.19,Ethiopia,1.05,0.52,3Mali,1.05,0.66,Cote d'Ivoire,0.91,1.46,Madagascar,0.84,0.97,Sudan,0.84,1.38,Tanzania,0.83,0.74,Rwanda,0.77,0.56,Djibouti,0.73,0.35,Mauritania,0.71,1.19,Eritrea,0.69,0.84,Sierra Leone,0.57,0.9,Malawi,0.54,0.87,Angola,0.32,0.28,Burkina Faso,0.28,0.35,Mozambique,0.17,0.12,Haiti,,1.13,
