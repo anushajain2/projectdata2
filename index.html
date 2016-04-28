@@ -15,16 +15,40 @@ body {
   background-color: black;
   } 
 div { 
-  margin: 30px; 
+  margin: 5px; 
 }
-div#map{
+div#rank{
+  clear: left;
+  height: auto;
+  width: auto;
+  margin: 30px;
+  color: orange;
+  font-size: 30px;
+}
+span#map{
+  margin: 30px;
+  height: auto;
+  width: auto;
+  float: left;
+  padding: 5px;
+}
+span#deets{
+  padding-top: 10px;
+  margin-top: 30px;
+  height: auto;
+  width: 300px;
   float: left;
 }
+span {
+  color: orange;
+}
 svg { 
-  background-color: black; 
+  background-color: black;
 }
 h1 {
   font-weight: bolder;
+  color: orange;
+  font-size: 60px;
 }
 h2 {
   font-weight: bold;
@@ -57,11 +81,19 @@ text {
 
 
 <!-- The SVG element will go in here -->
-<div id="buttons">
+<!-- <div id="buttons">
   <button id="change1">Let's go!</button>
-</div>
-<div id="map"></div>
-<h2></h2>
+</div> --> 
+<span id="map"></span>
+<span id="deets">
+  <div id='gender'>Gender Gap: </div><br>
+  <div id='pov125'>Poverty Gap (1.25): </div><br>
+  <div id='pov500'>Poverty Gap (5.00): </div><br>
+  <div id='undernourishment'>Undernourishment: </div><br>
+  <div id='childMort'>Child Mortality Rate: </div><br>
+  <div id='GDP'>GDP Growth: </div><br>
+</span>
+<div id='rank'></div>
 
 <script>
 // svg parameters
@@ -88,6 +120,12 @@ var active = d3.select(null);
 var g = svg.append("g");
 var worldObjects;
 var temp;
+var gD;
+var p125D;
+var p500D;
+var uD;
+var cD;
+var dD;
 
 // Build map, add hover/click effects
 function draw() {
@@ -106,18 +144,6 @@ function draw() {
       return populationScale(edRanksAvgs[isoCodes[0][country.id]]);
     })
     .style("stroke", "white")
-    // .style("stroke-width", 1)
-    // highlight country in black on hover
-    // TODO: Prettify the detail spreadsheet that comes with the hover effect
-    // .on("mouseover", function (d) {
-    //   d3.select("h2").text(isoCodes[0][d.id] + "\nDetails will go here?");
-    //   d3.select(this)
-    //     .style("fill","black");
-    //   })
-    // .on("mouseout", function(d) {
-    //     d3.select(this)
-    //     .style("fill", digitScale(Math.floor(d.id / 100)));
-    //   })
     .on("click", clicked);
     
     g.append("path")
@@ -150,7 +176,7 @@ function clicked(d) {
       translate = [-1 * bounds[0][0] * scale, (-1 * bounds[0][1] * scale) + 100]
 
   g.transition()
-      .duration(1000)
+      .duration(500)
       .style("stroke-width", 1.5 / scale + "px")
       .attr("transform", "translate(" + translate + ")scale(" + scale + ")")
 
@@ -164,16 +190,50 @@ function clicked(d) {
     .attr('y', 0)
     .attr('font-size', '40px')
 
-  g.append('text')
-    .attr('class', 'rank')
-    .text("Average Education Index: " + edRanksAvgs[isoCodes[0][d.id]])
-    .attr('x', bounds[0][0])
-    .attr('y', bounds[1][1]+80/scale)
-    .attr("font-size", 30 / scale + 'px')
+  // g.append('text')
+  //   .attr('class', 'rank')
+  //   .text("Average Education Index: " + edRanksAvgs[isoCodes[0][d.id]])
+  //   .attr('x', bounds[0][0])
+  //   .attr('y', bounds[1][1]+80/scale)
+  //   .attr("font-size", 30 / scale + 'px')
 
+
+  d3.select('svg').transition().duration(500)
+    .attr('width', '400px')
+    .attr('height', '400px');
+  // d3.select('#map').transition().duration(500)
+  //   .attr('width', '400px')
+  //   .attr('height', '300px');
+  d3.select('#rank').html("Average Education Index: " + edRanksAvgs[isoCodes[0][d.id]]);
+
+  gD = d3.select('#gender');
+  gD.html(gD.html() + genderGapAvgs[isoCodes[0][d.id]] + '%');
+  p125D = d3.select('#pov125');
+  p125D.html(p125D.html() + povertyGap125Avgs[isoCodes[0][d.id]] + '%');
+  p500D = d3.select('#pov500');
+  p500D.html(p500D.html() + povertyGap5Avgs[isoCodes[0][d.id]] + '%');
+  uD = d3.select('#undernourishment');
+  uD.html(uD.html() + undernourishmentAvgs[isoCodes[0][d.id]] + '%');
+  cD = d3.select('#childMort');
+  cD.html(cD.html() + childMortAvgs[isoCodes[0][d.id]] + '%');
+  dD = d3.select('#GDP');
+  dD.html(dD.html() + GDPGrowthAvgs[isoCodes[0][d.id]] + '%');
   // g.append('text')
   //   .attr('class', 'details')
-  //   .text
+  //   .attr('x', bounds[1][0]+50/scale)
+  //   .attr('y', bounds[0][1])
+  //   .attr("font-size", 30 / scale + 'px')
+  //   .append('span').text('Gender Gap: ' + 7)
+  //   .append("br")
+  //   .append('span').text('Poverty Gap ($1.25): ' + 7)
+  //   .append("br")
+  //   .append('span').text('Poverty Gap ($5): ' + 7)
+  //   .append("br")
+  //   .append('span').text('Undernourishment: ' + 7)
+  //   .append("br")
+  //   .append('span').text('Child Mortality Rate: ' + 7)
+  //   .append("br")
+  //   .append('span').text('GDP Growth Rate: ' + 7)
 
   drawData();
 }
@@ -184,13 +244,23 @@ function reset() {
   active = d3.select(null);
 
   g.transition()
-      .duration(750)
+      .duration(500)
       .style("stroke-width", "1.5px")
       .attr("transform", "");
+  svg.transition().duration(500).attr('width',"960px").attr('height', '600px');
+  d3.select('#map').transition().duration(500).attr('width',"960px").attr('height', '600px');
 
   svg.selectAll('text').remove();
 
-  temp.transition().delay(750).style('display', 'inline');
+  temp.transition().delay(500).style('display', 'inline');
+
+  d3.select('#rank').html('');
+  gD.html('Gender Gap: ')
+  p125D.html('Poverty Gap (1.25): ')
+  p500D.html('Poverty Gap (5.00): ')
+  uD.html('Undernourishment: ')
+  cD.html('Child Mortality Rate: ')
+  dD.html('GDP Growth: ')
 
 }
 
