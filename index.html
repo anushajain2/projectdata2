@@ -12,7 +12,7 @@
 <style>
 body { 
   font-family: "Open Sans"; 
-  background-color: white;
+  background-color: #f2f2f2;
   } 
 div { 
   margin: 5px; 
@@ -43,7 +43,7 @@ span {
   color: orange;
 }
 svg { 
-  background-color: white;
+  background-color: #f2f2f2;
 }
 h1 {
   font-weight: bolder;
@@ -73,7 +73,15 @@ text {
   alignment-baseline: hanging;
   fill: orange;
 }
+line.axis {
+  stroke: black;
+}
+text.axisRight {
+  text-anchor: end;
+}
+text.axisLeft {
 
+}
 #butti {
   width: 960px;
   height: 50px;
@@ -83,7 +91,7 @@ text {
 </head>
 <body>
 
-<h1>EDUCATION AND STUFF</h1>
+<h1>EDUCATION AND THE MYTHS</h1>
 
 
 <!-- The SVG element will go in here -->
@@ -134,7 +142,7 @@ var digitScale = d3.scale.category20c()
 // Note that (1) this is a *linear* scale, but its output is a color code
 // and (2) this is *piecewise* linear, essentially combining two linear scales
 // that diverge at 0.
-var populationScale = d3.scale.linear().domain([0, 10]).range(["red", "green"]);
+var populationScale = d3.scale.linear().domain([0, 5, 10]).range(["#d8b365", "#f5f5f5", "#003333"]);
 
 var map = d3.select("#map").append("svg")
     .attr('class','mapsvg')
@@ -154,6 +162,19 @@ var dD;
 // Build map, add hover/click effects
 function draw() {
   d3.json("world-50m.json", function(error, world) {
+
+    gD = d3.select('#gender');
+    gD.html(gD.html() + f(genderGapAvgs['world']) + '%');
+    p125D = d3.select('#pov125');
+    p125D.html(p125D.html() + f(povertyGap125Avgs['world']) + '%');
+    p500D = d3.select('#pov500');
+    p500D.html(p500D.html() + f(povertyGap5Avgs['world']) + '%');
+    uD = d3.select('#undernourishment');
+    uD.html(uD.html() + f(undernourishmentAvgs['world']) + '%');
+    cD = d3.select('#childMort');
+    cD.html(cD.html() + f(childMortAvgs['world']) + '%');
+    dD = d3.select('#GDP');
+    dD.html(dD.html() + f(GDPGrowthAvgs['world']) + '%');
     //worldObjects = world;
     worldObjects = topojson.feature(world, world.objects.countries).features
 
@@ -165,9 +186,12 @@ function draw() {
     .style("fill", function (country) {
       // Grab the first digit of the FIPS code, and convert it
       //  to a color.
+      if (isNaN(edRanksAvgs[isoCodes[0][country.id]])){
+        return "white"
+      }
       return populationScale(edRanksAvgs[isoCodes[0][country.id]]);
     })
-    .style("stroke", "white")
+    .style("stroke", "black")
     .on("click", clicked);
     
     gMap.append("path")
