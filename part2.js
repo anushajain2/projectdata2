@@ -22,6 +22,7 @@ var childMort1;
 var povertyGap5N;
 var povertyGap25N;
 var undernourishment1;
+var genderGap1;
 
 var iter = 1;
 var step = [0,2000,2005,2008,2009,2010,2011,2012];
@@ -88,15 +89,14 @@ d3.csv("GenderGap1.csv", function (error, data) {
   
 });
 
-
-
 function gg() {
 
-	xScale = d3.scale.linear()
+	 xScale = d3.scale.linear()
 		.domain([0, 10]).range([padding, width - padding]);
 		
 	 yScale = d3.scale.linear()
 		.domain([0, 10]).range([height - padding, padding]);
+
 
 	//Represent countries using Education Index
 	 // Will add transitions to this, and use in every visualization.
@@ -117,14 +117,45 @@ function gg() {
 			d3.select("#Value").text(d[2012]);
 	    });
 
-	     genderGap1.forEach(function(t){
-	        edRanks.forEach(function(d){
+}
+
+
+function gg1(){
+
+     if(circles3!=null){
+	 	circles3.remove();
+	 }
+	 if(circles4!=null){
+	 	circles4.remove();
+	 }
+
+	 if(circles5!=null){
+	 	circles5.remove();
+	 }
+
+     xScale = d3.scale.linear()
+		.domain([0, 10]).range([padding, width - padding]);
+		
+	 yScale = d3.scale.linear()
+		.domain([0, 10]).range([height - padding, padding]);
+	circles.transition().duration(1000)
+	.attr("cx", function(d) { return xScale(d[2012]); })
+	.attr("cy", "100px")
+	.attr("r", 10)
+	.attr("country", function(d) { return d["Country"] })
+	.attr("value", function(d) { return d[2012]; })
+	.attr("MID", function(d){ return d["MID"]; })
+	.style("fill", function(d) { return colorScale((d[2012] / 10) * 100); })
+	.style("opacity", 1);
+
+	 genderGap1.forEach(function(t){
+	       edRanks.forEach(function(d){
 	          if(t["Country"]==d["Country"]) {
 	             t[2012] = d[2012];
 	          }
 	       });
 	       
-	     });
+	  });
 
 	     circles1 = svg.selectAll(".plot2").data(genderGap1);
 	     circles1.enter().append("circle")
@@ -140,7 +171,6 @@ function gg() {
 	    	.on("mouseover", function (d) {
 	    		d3.select("#location").text(d["Country"]);
 	     });
-
 }
 
 function pg() {
@@ -148,7 +178,12 @@ function pg() {
    var size2 = 0;
    var size3 = 0;
 
-  
+    if(circles1!=null){
+	 	circles1.remove();
+	 }
+	 if(circles5!=null){
+	 	circles5.remove();
+	 }
 
    var rScalePG = d3.scale.linear().domain([0, 100]).range([5, 20]);
    var colorScalePG = d3.scale.linear().domain([1, 12]).range(["#1e7b7b", "#c1f0f0"]);
@@ -204,7 +239,7 @@ function pg() {
             
             else { 
               d3.select(this).transition().duration(1000)
-              .attr("cx", "0px");  
+              .attr("cx", "-50px");  
 
             } 
             
@@ -577,14 +612,21 @@ function mr() {
 
 }
 
-function gdp() {
-
-
-}
 
 function mal() { 
-    //circles1.remove();
-    var rScale = d3.scale.linear().domain([5, 50]).range([5, 20]);
+
+    if(circles3!=null){
+	 	circles3.remove();
+	 }
+	 if(circles4!=null){
+	 	circles4.remove();
+	 }
+
+	 if(circles1!=null){
+	 	circles1.remove();
+	 }   
+
+	var rScale = d3.scale.linear().domain([5, 50]).range([5, 20]);
     var colorScaleMal = d3.scale.linear().domain([5, 25, 45]).range(["#d8b365", "#f5f5f5", "#5ab4ac"]);
 
     circles5 = svg.selectAll(".plot5").data(undernourishment1);
@@ -609,11 +651,16 @@ function mal() {
 
     circles.each(function (d, i) {
             if (isIncludedMal(d3.select(this).attr("country"))) {
-            	  console.log(d3.select(this).attr("MID"));
                   d3.select(this).transition().duration(1000)
                   .attr("cx", "500px")  
                   .attr("cy", function(d){
-					  return d["MID"]*50 + "px";
+                  	  if(d["MID"]==0) { 
+                  	  	return "-100px";
+                  	  }
+                  	  else {
+ 						return d["MID"]*50 + "px";
+                  	  }
+					  
 				  })
                   .attr("r", function(d) { return rScaleE(d[2012]); });
             }
@@ -631,4 +678,8 @@ function mal() {
             });
              
     });  
+
+}
+
+
 

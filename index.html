@@ -73,6 +73,12 @@ text {
   alignment-baseline: hanging;
   fill: orange;
 }
+
+#butti {
+  width: 960px;
+  height: 50px;
+  margin-bottom: 50px;
+}
 </style>
 </head>
 <body>
@@ -95,10 +101,12 @@ text {
 </span>
 <div id='rank'></div>
 <div>
-<button onclick="gg()">Gender Gap</button>
+<button onclick="gg()" id="butti">The 5 Myths related to Education: True OR Not? CLICK TO FIND OUT!! </button>
+</div>
+<div>
+<button onclick="gg1()">Gender Gap</button>
 <button onclick="pg()">Poverty Gap</button>
 <button onclick="mr()">Mortality Rate</button>
-<button onclick="gdp()">GDP Growth</button>
 <button onclick="mal()">Malnutrition</button>
 </div>
 <div>
@@ -109,6 +117,7 @@ text {
   <div id="plot2"></div>
 </div>
 <script src="part2.js"></script>
+
 <script>
 // svg parameters
 var w = 960,
